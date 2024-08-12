@@ -1,12 +1,14 @@
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
+from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import OneHotEncoder
 import numpy as np
 from bs4 import BeautifulSoup
+import tensorflow as tf
 import requests
 import warnings
-from transformers import pipeline
+from transformers import pipeline,AutoTokenizer, AutoModelForSeq2SeqLM
 import re
 import json
 from waitress import serve
@@ -210,3 +212,27 @@ def parse_query(query):
     location = response.get('location')
     agent_name = response.get('agent_name')
     return price, bedrooms, location, agent_name
+def main(query):
+    url = "https://sapi.hauzisha.co.ke/api/properties/search"
+    params = {
+        "per_page": 300
+    }
+
+    df = fetch_data(url, params)
+    df = clean_data(df)
+    df = convert_bedrooms_to_integers(df)
+
+    query_keywords = extract_keywords(query)
+    vectorizer, tfidf_matrix = preprocess_text(df, query_keywords)
+    encoder, encoded_categorical_data = encode_categorical_data(df)
+    combined_features = combine_features(tfidf_matrix, encoded_categorical_data)
+    
+    recommendations = get_recommendations(query, vectorizer, tfidf_matrix, encoder, encoded_categorical_data, df)
+    return recommendations
+
+if __name__ == "__main__":
+    sample_query = "2 Bedroom house for rent at Ruiru for 50000 KSh"
+    recommendations = main(sample_query)
+    print("\nRecommended Properties:")
+    for rec in recommendations:
+        print(f"ID: {rec['id']}, Submission Type: {rec['submission_type']}, Bedrooms: {rec['bedrooms']}, Agent: {rec['agent_name']}, Price: {rec['price_amount']} {rec['price_label']} ({rec['price_currency']}), Description: {rec['formatted_description'][:100]}..., Score: {rec['score']}")
