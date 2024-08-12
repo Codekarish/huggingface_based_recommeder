@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Recommendation</title>
+</head>
+<body>
+    <h1>Property Recommendation System</h1>
+    <div>
+        <input type="text" id="query" placeholder="Enter your query here">
+        <button onclick="search()">Search</button>
+    </div>
+    <div id="results">
+        <!-- Results will be displayed here -->
+    </div>
+
+    <script>
+        function search() {
+            const query = document.getElementById('query').value;
+            fetch('/recommend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({ 'query': query })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = '';
+                if (data.length === 0) {
+                    resultsDiv.innerHTML = '<p>No results found.</p>';
+                } else {
+                    data.forEach(property => {
+                        const propertyDiv = document.createElement('div');
+                        propertyDiv.innerHTML = `
+                            <h2>${property.name}</h2>
+                            <p>${property.description}</p>
+                            <p>Price: ${property.price_amount}</p>
+                            <p>Agent: ${property.agent_name}</p>
+                            <p>Score: ${property.score}</p>
+                        `;
+                        resultsDiv.appendChild(propertyDiv);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
