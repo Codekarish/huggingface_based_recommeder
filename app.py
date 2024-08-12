@@ -3,11 +3,6 @@ import recommend
 
 app = Flask(__name__)
 
-# Initialize your model and variables
-vectorizer, tfidf_matrix = recommend.preprocess_text()  # Adjust according to your setup
-encoder, encoded_categorical_data = recommend.encode_categorical_data()
-df = recommend.fetch_data()  # Make sure to provide the URL and params if necessary
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -18,7 +13,10 @@ def recommend_route():
     if not query:
         return jsonify({"error": "No query provided"}), 400
     
-    recommendations = recommend.get_recommendations(query, vectorizer, tfidf_matrix, encoder, encoded_categorical_data, df)
+    # Call the recommendation function directly from recommend.py
+    recommendations = recommend.get_recommendations(query)
+    
+    # Convert the recommendations to a dictionary format suitable for JSON response
     recommendations = [rec.to_dict() for rec in recommendations]
     return jsonify(recommendations)
 
