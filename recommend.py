@@ -5,7 +5,6 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import OneHotEncoder
 import numpy as np
 from bs4 import BeautifulSoup
-import tensorflow as tf
 import requests
 import warnings
 import re
