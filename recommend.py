@@ -8,7 +8,6 @@ from bs4 import BeautifulSoup
 import tensorflow as tf
 import requests
 import warnings
-from transformers import pipeline,AutoTokenizer, AutoModelForSeq2SeqLM
 import re
 import json
 from waitress import serve
